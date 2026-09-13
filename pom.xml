@@ -150,49 +150,8 @@
                                     </annotationProcessorPaths>
                             </configuration>
                     </plugin>
-                    <plugin>
-                            <groupId>org.openrewrite.maven</groupId>
-                            <artifactId>rewrite-maven-plugin</artifactId>
-                            <version>6.48.0</version>
-                            <configuration>
-                                    <activeRecipes>
-                                            <recipe>org.openrewrite.java.spring.boot4.UpgradeSpringBoot_4_0</recipe>
-                                    </activeRecipes>
-                            </configuration>
-                            <dependencies>
-                                    <dependency>
-                                            <groupId>org.openrewrite.recipe</groupId>
-                                            <artifactId>rewrite-spring</artifactId>
-                                            <version>6.37.1</version>
-                                    </dependency>
-                            </dependencies>
-                    </plugin>
             </plugins>
         </build>
-
-        <repositories>
-                <repository>
-                        <id>codegenome</id>
-                        <url>https://artifacts.codegenomeproject.org/maven</url>
-                </repository>
-                <repository>
-                        <id>central</id>
-                        <name>Maven Central Repository</name>
-                        <url>https://repo.maven.apache.org/maven2</url>
-                        <releases>
-                                <enabled>true</enabled>
-                        </releases>
-                        <snapshots>
-                                <enabled>false</enabled>
-                        </snapshots>
-                </repository>
-        </repositories>
-        <pluginRepositories>
-                <pluginRepository>
-                        <id>codegenome</id>
-                        <url>https://artifacts.codegenomeproject.org/maven</url>
-                </pluginRepository>
-        </pluginRepositories>
 
 </project>
 
