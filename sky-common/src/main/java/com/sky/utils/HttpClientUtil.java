@@ -1,24 +1,28 @@
 package com.sky.utils;
 
-import com.alibaba.fastjson.JSONObject;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
+import com.alibaba.fastjson2.JSONObject;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.net.URIBuilder;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Http工具类
@@ -56,7 +60,7 @@ public class HttpClientUtil {
             response = httpClient.execute(httpGet);
 
             //判断响应状态
-            if(response.getStatusLine().getStatusCode() == 200){
+            if(response.getCode() == 200){
                 result = EntityUtils.toString(response.getEntity(),"UTF-8");
             }
         }catch (Exception e){
@@ -107,8 +111,8 @@ public class HttpClientUtil {
             response = httpClient.execute(httpPost);
 
             resultString = EntityUtils.toString(response.getEntity(), "UTF-8");
-        } catch (Exception e) {
-            throw e;
+        } catch (ParseException e) {
+            throw new IOException(e);
         } finally {
             try {
                 response.close();
@@ -143,11 +147,8 @@ public class HttpClientUtil {
                 for (Map.Entry<String, String> param : paramMap.entrySet()) {
                     jsonObject.put(param.getKey(),param.getValue());
                 }
-                StringEntity entity = new StringEntity(jsonObject.toString(),"utf-8");
-                //设置请求编码
-                entity.setContentEncoding("utf-8");
-                //设置数据类型
-                entity.setContentType("application/json");
+                StringEntity entity = new StringEntity(jsonObject.toString(),
+                        ContentType.APPLICATION_JSON.withCharset(StandardCharsets.UTF_8));
                 httpPost.setEntity(entity);
             }
 
@@ -157,8 +158,8 @@ public class HttpClientUtil {
             response = httpClient.execute(httpPost);
 
             resultString = EntityUtils.toString(response.getEntity(), "UTF-8");
-        } catch (Exception e) {
-            throw e;
+        } catch (ParseException e) {
+            throw new IOException(e);
         } finally {
             try {
                 response.close();
@@ -171,9 +172,9 @@ public class HttpClientUtil {
     }
     private static RequestConfig builderRequestConfig() {
         return RequestConfig.custom()
-                .setConnectTimeout(TIMEOUT_MSEC)
-                .setConnectionRequestTimeout(TIMEOUT_MSEC)
-                .setSocketTimeout(TIMEOUT_MSEC).build();
+                .setConnectTimeout(TIMEOUT_MSEC, TimeUnit.MILLISECONDS)
+                .setConnectionRequestTimeout(TIMEOUT_MSEC, TimeUnit.MILLISECONDS)
+                .setResponseTimeout(TIMEOUT_MSEC, TimeUnit.MILLISECONDS).build();
     }
 
 }
