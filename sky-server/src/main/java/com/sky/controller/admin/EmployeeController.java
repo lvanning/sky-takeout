@@ -3,19 +3,19 @@ package com.sky.controller.admin;
 import com.sky.constant.JwtClaimsConstant;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import com.sky.properties.JwtProperties;
+import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.EmployeeService;
 import com.sky.utils.JwtUtil;
 import com.sky.vo.EmployeeLoginVO;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -80,7 +80,7 @@ public class EmployeeController {
         }
         
         /**
-         *
+         * 新增员工
          * @param employeeDTO
          * @return
          */
@@ -92,4 +92,33 @@ public class EmployeeController {
                 return Result.success();
         }
         
+        /**
+         * 分页查询员工信息
+         * @return
+         */
+        @GetMapping("/page")
+        @Operation(summary = "分页查询员工信息", parameters = {
+                @Parameter(name = "name", description = "员工姓名", example = "张三"),
+                @Parameter(name = "page", description = "页码", example = "1"),
+                @Parameter(name = "pageSize", description = "每页记录数", example = "10")
+        })
+        public Result<PageResult> pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
+                 log.info("分页查询员工信息");
+                 PageResult pageResult = employeeService.pageQuery(employeePageQueryDTO);
+                 return Result.success(pageResult);
+        }
+        
+        /**
+         * 启用禁用员工账号
+         * @param status
+         * @param id
+         * @return
+         */
+        @PostMapping("/status/{status}")
+        @Operation(summary = "启用禁用员工账号")
+        public Result startOrStop(@PathVariable Integer status, Long id){
+                log.info("启用禁用员工账号：status={}, id={}", status, id);
+                employeeService.startOrStop(status, id);
+                return Result.success();
+        }
 }
