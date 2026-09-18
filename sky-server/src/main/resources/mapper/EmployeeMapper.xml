@@ -15,6 +15,7 @@
                         <if test="password != null">password = #{password},</if>
                         <if test="username != null">username = #{username},</if>
                 </set>
+                WHERE id = #{id}
         </update>
 
 
