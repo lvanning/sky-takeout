@@ -85,7 +85,7 @@ public class EmployeeController {
          * @return
          */
         @Operation(summary = "新增员工")
-        @PostMapping("/save")
+        @PostMapping
         public Result<String> save(@RequestBody EmployeeDTO employeeDTO) {
                 log.info("新增员工{}", employeeDTO);
                 employeeService.save(employeeDTO);
@@ -122,6 +122,11 @@ public class EmployeeController {
                 return Result.success();
         }
         
+        /**
+         * 根据id查询员工信息
+         * @param id
+         * @return
+         */
         @GetMapping("/{id}")
         @Operation(summary = "根据id查询员工信息")
         public Result<Employee> getById(@PathVariable Long id) {
@@ -130,6 +135,11 @@ public class EmployeeController {
                 return Result.success(employee);
         }
         
+        /**
+         * 修改员工信息
+         * @param employeeDTO
+         * @return
+         */
         @PutMapping
         @Operation(summary = "修改员工信息")
         public Result update(@RequestBody EmployeeDTO employeeDTO) {
