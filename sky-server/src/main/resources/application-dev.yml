@@ -6,3 +6,8 @@ sky:
     database: sky_take_out
     username: skyUser
     password: skypswd123
+
+  alioss:
+    endpoint: oss-cn-beijing.aliyuncs.com
+    region: cn-beijing
+    bucket-name: sky-take-out-lvanning
