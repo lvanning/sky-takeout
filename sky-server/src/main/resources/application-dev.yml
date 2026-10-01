@@ -16,3 +16,6 @@ sky:
     endpoint: oss-cn-beijing.aliyuncs.com
     region: cn-beijing
     bucket-name: sky-take-out-lvanning
+  wechat:
+    appid: wx1de883f0194d7ebb
+    secret: d8d3730db407a89212fe0de8e8344f7a

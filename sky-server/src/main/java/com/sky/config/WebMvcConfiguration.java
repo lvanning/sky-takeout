@@ -1,6 +1,7 @@
 package com.sky.config;
 
 import com.sky.interceptor.JwtTokenAdminInterceptor;
+import com.sky.interceptor.JwtTokenUserInterceptor;
 import com.sky.json.JacksonObjectMapper;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -21,9 +22,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebMvcConfiguration implements WebMvcConfigurer {
         
         private final JwtTokenAdminInterceptor jwtTokenAdminInterceptor;
+        private final JwtTokenUserInterceptor jwtTokenUserInterceptor;
         
-        public WebMvcConfiguration(JwtTokenAdminInterceptor jwtTokenAdminInterceptor) {
+        public WebMvcConfiguration(JwtTokenAdminInterceptor jwtTokenAdminInterceptor, JwtTokenUserInterceptor jwtTokenUserInterceptor) {
                 this.jwtTokenAdminInterceptor = jwtTokenAdminInterceptor;
+                this.jwtTokenUserInterceptor = jwtTokenUserInterceptor;
         }
         
         /**
@@ -36,6 +39,11 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
                 registry.addInterceptor(jwtTokenAdminInterceptor)
                 .addPathPatterns("/admin/**")
                 .excludePathPatterns("/admin/employee/login");
+                
+                registry.addInterceptor(jwtTokenUserInterceptor)
+                .addPathPatterns("/user/**")
+                .excludePathPatterns("/user/user/login")
+                .excludePathPatterns("/user/shop/status");
         }
         
         /**
