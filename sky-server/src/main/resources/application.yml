@@ -50,6 +50,12 @@ sky:
     user-secret-key: SKY_TAKEOUT_JWT_SECRET_2026_CHANGE_ME_32B
     user-ttl: 7200000
     user-token-name: authentication
+  shop:
+    # 商家店铺地址(用于配送范围校验)
+    address: ${sky.shop.address}
+  baidu:
+    # 百度地图开放平台服务端应用 AK
+    ak: ${sky.baidu.ak}
   alioss:
     endpoint: ${sky.alioss.endpoint}
     bucket-name: ${sky.alioss.bucket-name}

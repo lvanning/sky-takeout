@@ -12,6 +12,12 @@ sky:
     password: 123456
     database: 10
 
+  shop:
+    address: 北京市海淀区上地十街10号
+  baidu:
+    # 注册百度地图开放平台,创建「服务端应用」获取 AK 填入;未配置时跳过配送范围校验
+    ak: "jb4kwUEJyljpIcd4r9daHVH9cgYNZYcv"
+
   alioss:
     endpoint: oss-cn-beijing.aliyuncs.com
     region: cn-beijing
