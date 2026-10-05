@@ -90,7 +90,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService{
                 ShoppingCart shoppingCart = ShoppingCart.builder()
                         .userId(userId)
                         .build();
-                shoppingCartMapper.deleteByUserId(shoppingCart);
+                shoppingCartMapper.deleteByUserId(shoppingCart.getUserId());
         
         }
         

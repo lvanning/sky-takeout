@@ -33,7 +33,7 @@ public interface ShoppingCartMapper {
         void insert(ShoppingCart shoppingCart);
         
         @Delete("delete from shopping_cart where user_id = #{userId}")
-        void deleteByUserId(ShoppingCart shoppingCart);
+        void deleteByUserId(Long userId);
         
         /**
          * 根据菜品ID或套餐ID删除购物车记录
