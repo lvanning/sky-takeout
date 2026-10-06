@@ -26,13 +26,13 @@ import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import com.sky.websocket.WebSocketServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -51,14 +51,16 @@ public class OrderServiceImpl implements OrderService {
         private final ShoppingCartMapper shoppingCartMapper;
         private final UserMapper userMapper;
         private final WeChatPayUtil weChatPayUtil;
+        private final WebSocketServer webSocketServer;
         
-        public OrderServiceImpl(OrderMapper orderMapper, OrderDetailMapper orderDetailMapper, ShoppingCartMapper shoppingCartMapper, AddressBookMapper addressBookMapper, UserMapper userMapper, WeChatPayUtil weChatPayUtil) {
+        public OrderServiceImpl(WebSocketServer webSocketServer, OrderMapper orderMapper, OrderDetailMapper orderDetailMapper, ShoppingCartMapper shoppingCartMapper, AddressBookMapper addressBookMapper, UserMapper userMapper, WeChatPayUtil weChatPayUtil) {
                 this.orderMapper = orderMapper;
                 this.orderDetailMapper = orderDetailMapper;
                 this.shoppingCartMapper = shoppingCartMapper;
                 this.addressBookMapper = addressBookMapper;
                 this.userMapper = userMapper;
                 this.weChatPayUtil = weChatPayUtil;
+                this.webSocketServer = webSocketServer;
         }
 
         @Value("${sky.shop.address}")
@@ -134,7 +136,7 @@ public class OrderServiceImpl implements OrderService {
                 Long userId = BaseContext.getCurrentId();
                 User user = userMapper.getById(userId);
                 
-                //调用微信支付接口，生成预支付交易单
+                /*//调用微信支付接口，生成预支付交易单
                 JSONObject jsonObject = weChatPayUtil.pay(
                 ordersPaymentDTO.getOrderNumber(), //商户订单号
                 new BigDecimal(0.01), //支付金额，单位 元
@@ -144,11 +146,33 @@ public class OrderServiceImpl implements OrderService {
                 
                 if (jsonObject.getString("code") != null && jsonObject.getString("code").equals("ORDERPAID")) {
                         throw new OrderBusinessException("该订单已支付");
-                }
+                }*/
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("code", "ORDERPAID");
                 
                 OrderPaymentVO vo = jsonObject.toJavaObject(OrderPaymentVO.class);
                 vo.setPackageStr(jsonObject.getString("package"));
                 
+                //为了替代微信支付成功后的数据库订单状态更新，多定义一个方法进行更改
+                Integer orderPaidStatus = Orders.PAID;//已支付
+                Integer OrderStatus = Orders.TO_BE_CONFIRMED;//待接单
+                
+                //发现没有将支付时间check_out属性赋值，所以在这里更新
+                LocalDateTime checkOutTime = LocalDateTime.now();
+                
+                //获取订单号码
+                String orderNumber = ordersPaymentDTO.getOrderNumber();
+                
+                log.info("调用updateStatus方法，用于替换微信支付更新数据库状态问的题");
+                orderMapper.updateStatus(OrderStatus, orderPaidStatus, checkOutTime, orderNumber);
+                
+                Map map = new HashMap<>();
+                map.put("type", 1);
+                map.put("orderId", 1213213213);
+                map.put("content", "订单号：" + 1651651651);
+                
+                String message = JSON.toJSONString(map);
+                webSocketServer.sendToAllClient(message);
                 return vo;
         }
         
@@ -171,6 +195,17 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
                 orderMapper.update(orders);
+                
+                //向WebSocket发送消息
+//                Map map = new HashMap<>();
+//                map.put("type", 1);
+//                map.put("orderId", ordersDB.getId());
+//                map.put("content", "订单号：" + outTradeNo);
+//
+//                String message = JSON.toJSONString(map);
+//                webSocketServer.sendToAllClient(message);
+                
+                
         }
 
         /**
@@ -514,7 +549,7 @@ public class OrderServiceImpl implements OrderService {
 
                 orderMapper.update(orders);
         }
-
+        
         /**
          * 检查客户的收货地址是否超出配送范围
          *
@@ -583,5 +618,26 @@ public class OrderServiceImpl implements OrderService {
                         //配送距离超过5000米
                         throw new OrderBusinessException("超出配送范围");
                 }
+        }
+        
+        /**
+         * 催单
+         * @param id
+         */
+        @Override
+        public void reminder(Long id) {
+                Orders ordersDB = orderMapper.getById(id);
+                
+                //校验订单是否存在，且状态为4
+                if(ordersDB == null ){
+                        throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+                }
+                
+                Map map = new HashMap();
+                map.put("type", 2);
+                map.put("orderId", id);
+                map.put("content", "订单号：" + ordersDB.getNumber());
+                
+                webSocketServer.sendToAllClient(JSON.toJSONString(map));
         }
 }
