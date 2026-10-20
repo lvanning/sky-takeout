@@ -1,0 +1,150 @@
+package com.sky.controller.admin;
+
+import com.sky.constant.JwtClaimsConstant;
+import com.sky.dto.EmployeeDTO;
+import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
+import com.sky.entity.Employee;
+import com.sky.properties.JwtProperties;
+import com.sky.result.PageResult;
+import com.sky.result.Result;
+import com.sky.service.EmployeeService;
+import com.sky.utils.JwtUtil;
+import com.sky.vo.EmployeeLoginVO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * 员工管理
+ */
+@RestController
+@RequestMapping("/admin/employee")
+@Slf4j
+@Tag(name = "员工相关接口")
+public class EmployeeController {
+        
+        private final EmployeeService employeeService;
+        private final JwtProperties jwtProperties;
+        
+        public EmployeeController(EmployeeService employeeService, JwtProperties jwtProperties) {
+                this.employeeService = employeeService;
+                this.jwtProperties = jwtProperties;
+        }
+        
+        /**
+         * 登录
+         *
+         * @param employeeLoginDTO
+         * @return
+         */
+        @Operation(summary = "员工登录")
+        @PostMapping("/login")
+        public Result<EmployeeLoginVO> login(@RequestBody EmployeeLoginDTO employeeLoginDTO) {
+                log.info("员工登录：{}", employeeLoginDTO);
+                
+                Employee employee = employeeService.login(employeeLoginDTO);
+                
+                //登录成功后，生成jwt令牌
+                Map<String, Object> claims = new HashMap<>();
+                claims.put(JwtClaimsConstant.EMP_ID, employee.getId());
+                String token = JwtUtil.createJWT(
+                jwtProperties.getAdminSecretKey(),
+                jwtProperties.getAdminTtl(),
+                claims);
+                
+                EmployeeLoginVO employeeLoginVO = EmployeeLoginVO.builder()
+                .id(employee.getId())
+                .userName(employee.getUsername())
+                .name(employee.getName())
+                .token(token)
+                .build();
+                
+                return Result.success(employeeLoginVO);
+        }
+        
+        /**
+         * 退出
+         *
+         * @return
+         */
+        @Operation(summary = "员工退出")
+        @PostMapping("/logout")
+        public Result<String> logout() {
+                return Result.success();
+        }
+        
+        /**
+         * 新增员工
+         * @param employeeDTO
+         * @return
+         */
+        @Operation(summary = "新增员工")
+        @PostMapping
+        public Result<String> save(@RequestBody EmployeeDTO employeeDTO) {
+                log.info("新增员工{}", employeeDTO);
+                employeeService.save(employeeDTO);
+                return Result.success();
+        }
+        
+        /**
+         * 分页查询员工信息
+         * @return
+         */
+        @GetMapping("/page")
+        @Operation(summary = "分页查询员工信息", parameters = {
+                @Parameter(name = "name", description = "员工姓名", example = "张三"),
+                @Parameter(name = "page", description = "页码", example = "1"),
+                @Parameter(name = "pageSize", description = "每页记录数", example = "10")
+        })
+        public Result<PageResult> pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
+                 log.info("分页查询员工信息");
+                 PageResult pageResult = employeeService.pageQuery(employeePageQueryDTO);
+                 return Result.success(pageResult);
+        }
+        
+        /**
+         * 启用禁用员工账号
+         * @param status
+         * @param id
+         * @return
+         */
+        @PostMapping("/status/{status}")
+        @Operation(summary = "启用禁用员工账号")
+        public Result startOrStop(@PathVariable Integer status, Long id){
+                log.info("启用禁用员工账号：status={}, id={}", status, id);
+                employeeService.startOrStop(status, id);
+                return Result.success();
+        }
+        
+        /**
+         * 根据id查询员工信息
+         * @param id
+         * @return
+         */
+        @GetMapping("/{id}")
+        @Operation(summary = "根据id查询员工信息")
+        public Result<Employee> getById(@PathVariable Long id) {
+                log.info("根据id查询员工信息：id={}", id);
+                Employee employee = employeeService.getById(id);
+                return Result.success(employee);
+        }
+        
+        /**
+         * 修改员工信息
+         * @param employeeDTO
+         * @return
+         */
+        @PutMapping
+        @Operation(summary = "修改员工信息")
+        public Result update(@RequestBody EmployeeDTO employeeDTO) {
+                log.info("修改员工信息：{}", employeeDTO);
+                employeeService.update(employeeDTO);
+                return Result.success();
+        }
+}

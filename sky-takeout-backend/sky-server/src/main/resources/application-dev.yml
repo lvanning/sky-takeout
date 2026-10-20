@@ -1,0 +1,36 @@
+# 本地开发配置：baidu.ak 与 wechat.secret 已脱敏，运行前请替换为你自己的密钥
+sky:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    host: localhost
+    port: 3306
+    database: sky_take_out
+    username: skyUser
+    password: skypswd123
+  redis:
+    host: localhost
+    port: 6379
+    password: 123456
+    database: 10
+
+  shop:
+    address: 北京市海淀区上地十街10号
+  baidu:
+    # 注册百度地图开放平台,创建「服务端应用」获取 AK 填入;未配置时跳过配送范围校验
+    ak: "your-baidu-map-ak"
+
+  alioss:
+    endpoint: oss-cn-beijing.aliyuncs.com
+    region: cn-beijing
+    bucket-name: sky-take-out-lvanning
+  wechat:
+    appid: wx1de883f0194d7ebb
+    secret: your-wechat-appsecret
+    mchid: xxxx
+    mch-serial-no: xxxx
+    private-key-file-path: xxxx
+    api-v3-key: xxxx
+    we-chat-pay-cert-file-path: xxxx
+    notify-url: xxxx
+    refund-notify-url: xxxx
+
