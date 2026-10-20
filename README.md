@@ -38,7 +38,7 @@
 | 运行时 | **Java** | **25** | 语言与运行环境 |
 | 核心框架 | **Spring Boot** | **4.1.1** | 自动装配、依赖管理、内嵌容器 |
 | Web 层 | **Spring MVC**（Spring Framework 7） | — | RESTful API、拦截器、全局异常 |
-| 持久层 | **MyBatis** + MyBatis Spring Boot Starter | 4.0.0 | SQL 映射、动态 SQL |
+| 持久层 | **MyBatis** + MyBatis Spring Boot Starter | 4.0.0（Starter） | SQL 映射、动态 SQL |
 | 数据库 | **MySQL** | 8.0+ | 业务数据存储 |
 | 缓存 | **Redis** + Spring Data Redis + Spring Cache | 6+ | 菜品/套餐缓存、店铺营业状态 |
 | 连接池 | **Druid** | 1.2.28 | 数据源与监控 |
@@ -78,7 +78,6 @@
 | 用户端 | **微信小程序** | WXML / WXSS / JavaScript |
 | 组件库 | **uni-ui** | popup、icons、nav-bar 等 |
 | 构建来源 | **uni-app** | 当前目录为编译后的微信小程序产物 |
-| 实时通信 | **WebSocket** | 连接 `/ws/{sid}` 接收来单、催单消息 |
 | 数据库 | **MySQL 8** | 11 张业务表，见 [`数据库设计文档`](数据库/数据库设计文档.md) |
 
 > **一句话技术栈**：`Java 25` · `Spring Boot 4` · `MyBatis` · `MySQL` · `Redis` · `JWT` · `WebSocket` · `AOP` · `Knife4j` · `Apache POI` · `Vue 2.7` · `TypeScript` · `Element UI` · `ECharts` · `Vuex` · `Axios` · `Sass` · `微信小程序`
@@ -94,7 +93,6 @@
 - 提交订单、订单备注、模拟支付
 - 历史订单、订单详情、再来一单
 - 店铺营业状态展示
-- WebSocket 接收来单 / 催单提醒
 
 ### 商家管理端（Vue）
 
@@ -126,7 +124,7 @@
 
 ```mermaid
 flowchart LR
-    MP["微信小程序<br/>用户端"] -->|HTTPS / JSON| API["Spring Boot API<br/>/admin/** + /user/**"]
+    MP["微信小程序<br/>用户端"] -->|HTTPS / JSON| API["Spring Boot API<br/>admin / user"]
     ADMIN["Vue 2 管理后台<br/>Element UI + ECharts"] -->|Axios /api| API
     API --> MYSQL[("MySQL 8<br/>sky_take_out")]
     API --> REDIS[("Redis<br/>菜品/套餐缓存<br/>店铺状态")]
@@ -315,7 +313,7 @@ http://localhost:8080/doc.html
 
 ## 📝 已知说明
 
-- **支付为模拟流程**：`OrderServiceImpl.payment()` 中真实微信预下单代码默认注释，当前调用后直接将订单置为已支付，便于本地跑通「下单 → 接单」闭环。接入真实微信支付需配置商户号、API v3 密钥、商户私钥与平台证书，并恢复注释代码。
+- **支付为模拟流程**：`OrderServiceImpl.payment()` 中真实微信预下单代码默认注释，当前调用后直接将订单置为已支付，便于本地跑通「下单 → 接单」闭环。真实支付与退款需配置商户号、API v3 密钥、商户私钥与平台证书，并恢复注释代码。
 - **小程序为编译产物**：当前仓库未包含 uni-app 源码，接口地址需在 `common/vendor.js` 中修改；长期维护建议补充源码工程。
 - **外部服务可选**：百度地图 AK 为空时会跳过配送范围校验；OSS 未配置凭证时图片上传不可用；微信登录需要有效 `appid` / `secret`。
 - **配置已脱敏**：公开仓库不包含真实第三方密钥，请使用自己的账号配置。
