@@ -1,0 +1,9 @@
+// 供 TypeScript 读取的 SCSS 变量导出。
+// Vue CLI 5 / css-loader 6 仅在 *.module.scss 文件中启用 :export。
+@import './_variables.scss';
+
+:export {
+  menuBg: $menuBg;
+  menuText: $menuText;
+  menuActiveText: $menuActiveText;
+}
