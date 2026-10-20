@@ -1,0 +1,32 @@
+# ---------- 本地配置 / 备份（不入库） ----------
+.local/
+sky-takeout-backend/.git-backup/
+小程序/project.private.config.json
+
+# ---------- 构建产物 ----------
+**/target/
+**/node_modules/
+**/dist/
+**/coverage/
+**/.cache/
+*.class
+
+# ---------- 依赖 / 临时文件 ----------
+front_end/project-sky-admin-vue-ts/.legacy-lockfiles/
+front_end/project-sky-admin-vue-ts/report.*.json
+front_end/nginx-1.30.4/
+front_end/vue-test/
+
+# ---------- IDE / 系统 ----------
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+*.log
+logs/
+
+# ---------- 其他 ----------
+**/.claude-code-gui/
+.env.local
+.env.*.local
